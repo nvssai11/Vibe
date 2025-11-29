@@ -1,0 +1,14 @@
+{
+  "id": "env-1234567890",
+  "name": "CommunityPlatformEnv",
+  "values": [
+    { "key": "baseUrl", "value": "http://localhost:5000", "enabled": true },
+    { "key": "userToken", "value": "", "enabled": true },
+    { "key": "adminToken", "value": "", "enabled": true },
+    { "key": "superToken", "value": "", "enabled": true },
+    { "key": "apartmentId", "value": "69293f48021d4e3164c0ef0a", "enabled": true },
+    { "key": "userId", "value": "", "enabled": true },
+    { "key": "resourceId", "value": "", "enabled": true },
+    { "key": "eventId", "value": "", "enabled": true }
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "info": {
+    "name": "Community Connection Platform",
+    "_postman_id": "c1b5f8d0-0000-4000-8000-abcdef123456",
+    "description": "Full backend testing for Phases 2, 3, 4 with environment variables",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register User",
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Alice\",\n  \"email\": \"alice@example.com\",\n  \"password\": \"alicepass\",\n  \"apartmentId\": \"{{apartmentId}}\",\n  \"flatNumber\": \"101\",\n  \"location\": { \"coordinates\": [78.5, 17.4] }\n}"
+        },
+        "url": {"raw": "{{baseUrl}}/api/auth/register","host":["{{baseUrl}}"],"path":["api","auth","register"]}
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Save userId after registration",
+              "pm.environment.set(\"userId\", pm.response.json().userId);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login User",
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"alicepass\"\n}"
+        },
+        "url": {"raw": "{{baseUrl}}/api/auth/login","host":["{{baseUrl}}"],"path":["api","auth","login"]}
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Save user token",
+              "pm.environment.set(\"userToken\", pm.response.json().token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login Admin",
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Content-Type","value":"application/json"}],
+        "body": {
+          "mode": "raw",
+           "raw": "{\n  \"email\": \"admin@sampleapt.com\",\n  \"password\": \"adminpass\"\n}"
+        },
+        "url": {"raw": "{{baseUrl}}/api/auth/login","host":["{{baseUrl}}"],"path":["api","auth","login"]}
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Save admin token",
+              "pm.environment.set(\"adminToken\", pm.response.json().token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "List Pending Users (Admin)",
+      "request": {
+        "method": "GET",
+        "header": [{"key":"Authorization","value":"Bearer {{adminToken}}"}],
+        "url": {"raw":"{{baseUrl}}/api/admin/pending-users/{{apartmentId}}","host":["{{baseUrl}}"],"path":["api","admin","pending-users","{{apartmentId}}"]}
+      }
+    },
+    {
+      "name": "Approve User (Admin)",
+      "request": {
+        "method": "POST",
+        "header": [{"key":"Authorization","value":"Bearer {{adminToken}}"},{"key":"Content-Type","value":"application/json"}],
+        "body": {
+          "mode":"raw",
+          "raw": "{\n  \"apartmentId\": \"{{apartmentId}}\",\n  \"userId\": \"{{userId}}\",\n  \"approve\": true\n}"
+        },
+        "url": {"raw":"{{baseUrl}}/api/admin/approve-user","host":["{{baseUrl}}"],"path":["api","admin","approve-user"]}
+      }
+    },
+    {
+      "name": "Add Resource",
+      "request": {
+        "method":"POST",
+        "header":[{"key":"Authorization","value":"Bearer {{userToken}}"},{"key":"Content-Type","value":"application/json"}],
+        "body":{"mode":"raw","raw":"{\n  \"title\":\"Lawn Mower\",\n  \"description\":\"Electric lawn mower\",\n  \"category\":\"Tools\",\n  \"apartment\":\"{{apartmentId}}\"\n}"},
+        "url":{"raw":"{{baseUrl}}/api/resources","host":["{{baseUrl}}"],"path":["api","resources"]}
+      },
+      "event":[{"listen":"test","script":{"exec":["pm.environment.set(\"resourceId\", pm.response.json()._id);"]}}]
+    },
+    {
+      "name": "Request Resource",
+      "request": {
+        "method":"PATCH",
+        "header":[{"key":"Authorization","value":"Bearer {{userToken}}"}],
+        "url":{"raw":"{{baseUrl}}/api/resources/{{resourceId}}/request","host":["{{baseUrl}}"],"path":["api","resources","{{resourceId}}","request"]}
+      }
+    },
+    {
+      "name": "Approve Resource",
+      "request": {
+        "method":"PATCH",
+        "header":[{"key":"Authorization","value":"Bearer {{adminToken}}"}],
+        "url":{"raw":"{{baseUrl}}/api/resources/{{resourceId}}/approve","host":["{{baseUrl}}"],"path":["api","resources","{{resourceId}}","approve"]}
+      }
+    },
+    {
+      "name": "Return Resource",
+      "request": {
+        "method":"PATCH",
+        "header":[{"key":"Authorization","value":"Bearer {{userToken}}"}],
+        "url":{"raw":"{{baseUrl}}/api/resources/{{resourceId}}/return","host":["{{baseUrl}}"],"path":["api","resources","{{resourceId}}","return"]}
+      }
+    },
+    {
+      "name": "Create Event",
+      "request": {
+        "method":"POST",
+        "header":[{"key":"Authorization","value":"Bearer {{userToken}}"},{"key":"Content-Type","value":"application/json"}],
+        "body":{"mode":"raw","raw":"{\n  \"title\":\"Neighborhood Cleanup\",\n  \"description\":\"Cleaning park\",\n  \"date\":\"2025-12-01T09:00:00.000Z\",\n  \"apartment\":\"{{apartmentId}}\"\n}"},
+        "url":{"raw":"{{baseUrl}}/api/events","host":["{{baseUrl}}"],"path":["api","events"]}
+      },
+      "event":[{"listen":"test","script":{"exec":["pm.environment.set(\"eventId\", pm.response.json()._id);"]}}]
+    },
+    {
+      "name": "RSVP Event",
+      "request": {
+        "method":"PATCH",
+        "header":[{"key":"Authorization","value":"Bearer {{userToken}}"}],
+        "url":{"raw":"{{baseUrl}}/api/events/{{eventId}}/rsvp","host":["{{baseUrl}}"],"path":["api","events","{{eventId}}","rsvp"]}
+      }
+    }
+  ]
+}
