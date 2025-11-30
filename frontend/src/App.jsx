@@ -6,13 +6,12 @@ import { AuthProvider } from "./context/AuthContext";
 import { AppProvider } from "./context/AppContext";
 
 // Dashboard Pages
-import DashboardLayout from "./components/DashboardLayout";
-
 import Home from "./pages/Dashboard/Home";
 import PeopleNearby from "./pages/Dashboard/PeopleNearby";
 import Resources from "./pages/Dashboard/Resources";
 import Events from "./pages/Dashboard/Events";
 import Profile from "./pages/Dashboard/Profile";
+import Messages from "./pages/Dashboard/Messages";
 
 // Auth Pages
 import Login from "./pages/Auth/Login";
@@ -26,32 +25,26 @@ import ApproveEvents from "./pages/Admin/ApproveEvents";
 
 // Components
 import ProtectedRoute from "./components/ProtectedRoute";
+import Navbar from "./components/Navbar";
 
 function App() {
   return (
     <AuthProvider>
       <AppProvider>
         <BrowserRouter>
+
           <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
             {/* Dashboard Routes (Protected) */}
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <DashboardLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Home />} />
-              <Route path="/dashboard/people-nearby" element={<PeopleNearby />} />
-              <Route path="dashboard/resources" element={<Resources />} />
-              <Route path="/dashboard/events" element={<Events />} />
-              <Route path="/dashboard/profile" element={<Profile />} />
-            </Route>
+            <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+<Route path="/dashboard/people-nearby" element={<ProtectedRoute><PeopleNearby /></ProtectedRoute>} />
+<Route path="dashboard/resources" element={<ProtectedRoute><Resources /></ProtectedRoute>} />
+<Route path="/dashboard/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />
+<Route path="/dashboard/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+<Route path="/dashboard/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
 
             {/* Admin Routes (Protected + Admin Only) */}
             <Route

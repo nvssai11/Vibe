@@ -1,6 +1,7 @@
 // frontend/src/components/UserCard.jsx
 import React from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from 'react-router-dom';
 
 export default function UserCard({ user }) {
   const roleColors = {
@@ -9,6 +10,7 @@ export default function UserCard({ user }) {
     super_admin: 'bg-purple-100 text-purple-800 border-purple-200'
   };
 
+  const navigate = useNavigate();
   return (
     <motion.div 
       className="user-card border rounded-xl p-5 shadow-lg hover:shadow-xl transition-all bg-white"
@@ -31,7 +33,7 @@ export default function UserCard({ user }) {
           
           {user.flatNumber && (
             <div className="flex items-center mt-1 space-x-1">
-              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
               <span className="text-sm text-gray-500">
@@ -41,7 +43,7 @@ export default function UserCard({ user }) {
           )}
         </div>
       </div>
-      
+
       <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-100">
         {user.role && (
           <motion.span 
@@ -51,8 +53,9 @@ export default function UserCard({ user }) {
             {user.role.replace("_", " ").toUpperCase()}
           </motion.span>
         )}
-        
-        {user.distance && (
+
+        <div className="flex items-center gap-3">
+          {user.distance && (
           <div className="flex items-center space-x-1">
             <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -63,6 +66,22 @@ export default function UserCard({ user }) {
             </span>
           </div>
         )}
+        
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            const validName = user.name && user.name !== "na" ? user.name : (user.email || "Unnamed Resident");
+            navigate(`/dashboard/messages?id=${encodeURIComponent(user._id)}&name=${encodeURIComponent(validName)}`);
+          }}
+          className="px-3 py-1 bg-blue-500 text-white rounded-lg text-sm flex items-center gap-1"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          Chat
+        </motion.button>
+        </div>
       </div>
     </motion.div>
   );

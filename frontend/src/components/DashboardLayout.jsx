@@ -1,21 +1,15 @@
-// frontend/src/components/DashboardLayout.jsx
-import React from "react";
-import { Outlet } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import React from 'react';
+import Navbar from './Navbar';
 
-export default function DashboardLayout() {
-  const { user } = useAuth();
-
+export default function DashboardLayout({ children }) {
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Main content */}
-      <div className="p-6">
-
-        {/* Page content */}
-        <div>
-          <Outlet />
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <main className="pt-16 pb-8 px-4 md:px-8">
+        <div className="max-w-7xl mx-auto">
+          {children}
         </div>
-      </div>
+      </main>
     </div>
   );
 }

@@ -3,17 +3,21 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { FiUsers, FiBook, FiCalendar, FiUser } from "react-icons/fi";
 import { motion } from "framer-motion";
+import Navbar from "../../components/Navbar";
 
 export default function Home() {
   const { user } = useAuth();
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="max-w-6xl mx-auto px-6 py-8 bg-gradient-to-br from-amber-50/30 to-orange-50/30 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20"
-    >
+    
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-6xl mx-auto px-6 py-8 bg-gradient-to-br from-amber-50/30 to-orange-50/30 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20"
+      >
       <motion.div 
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -121,5 +125,6 @@ export default function Home() {
         </motion.div>
       </motion.div>
     </motion.div>
+    </div>
   );
 }

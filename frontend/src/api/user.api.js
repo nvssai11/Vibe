@@ -7,16 +7,20 @@ import axiosClient from "./axiosClient";
 //   return res.data.users;
 // };
 
-export const getNearbyUsers = async ({ lat, lng }) => {
+export const getNearbyUsers = async ({ lat, lng, radius }) => {
+  console.log("[getNearbyUsers API] Request params:", { lat, lng, radius });
   const { data } = await axiosClient.get("/users/nearby", {
-    params: { lat, lng, radius: 2000 } // backend expects lat/lng
+    params: { lat, lng, radius }
   });
+  console.log("[getNearbyUsers API] Response:", data);
   
-  // Map users to include apartmentName if apartment exists
-  const usersWithApartmentNames = data.users.map(user => ({
-    ...user,
-    apartmentName: user.apartment?.name
-  }));
+  // Filter out current user and map to include apartmentName
+  const usersWithApartmentNames = data.users
+    .filter(user => user._id !== localStorage.getItem('userId'))
+    .map(user => ({
+      ...user,
+      apartmentName: user.apartment?.name
+    }));
   
   return usersWithApartmentNames;
 };
