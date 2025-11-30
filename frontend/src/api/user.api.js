@@ -24,7 +24,9 @@ export const getNearbyUsers = async ({ lat, lng }) => {
 
 // Update current user profile
 export const updateProfile = async (data) => {
+  console.log('Updating profile with data:', data);
   const res = await axiosClient.put("/users/profile", data);
+console.log('Update profile response:', res.data);
   return res.data;
 };
 

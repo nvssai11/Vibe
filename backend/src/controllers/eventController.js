@@ -32,26 +32,22 @@ export const listEvents = async (req, res) => {
     const { apartmentId } = req.params;
     const events = await Event.find({ apartment: apartmentId })
       .populate("createdBy", "name email")
-      .populate("participants", "name email");
+      .populate("participants", "name email"); // Ensure 'participants' is used consistently
     res.json(events);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-/**
- * RSVP event
- * PATCH /api/events/:id/rsvp
- */
 export const rsvpEvent = async (req, res) => {
   try {
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ error: "Event not found" });
 
-    if (event.participants.includes(req.userId)) {
+    if (event.participants.includes(req.userId)) { // Check 'participants' array
       return res.status(400).json({ error: "Already RSVPed" });
     }
-    event.participants.push(req.userId);
+    event.participants.push(req.userId); // Add to 'participants' array
     await event.save();
     res.json(event);
   } catch (err) {

@@ -6,7 +6,12 @@ import { motion } from "framer-motion";
 export default function EventCard({ event, currentUser, onRSVP }) {
   const { title, description, date, participants = [], image } = event;
 
-  const hasRSVPed = Array.isArray(participants) && participants?.some(u => u?._id === currentUser?._id);
+  console.log('currentUser:', currentUser);
+  console.log('participants:', participants);
+  const hasRSVPed = Array.isArray(participants) && participants?.some(u => {
+    console.log("Checking RSVP status:", { userId: currentUser?.id, participants });
+    return u?._id === currentUser?.id;
+  });
   const formattedDate = new Date(date).toLocaleString('en-US', {
     weekday: 'short',
     month: 'short',

@@ -163,18 +163,27 @@ export const requestResource = async (req, res) => {
 // APPROVE RESOURCE REQUEST 
 export const approveResource = async (req, res) => { 
   try { 
+    console.log("Approve resource request received", {
+      resourceId: req.params.id,
+      userId: req.user.id,
+      userRole: req.user.role
+    });
+
     const resource = await Resource.findById(req.params.id); 
 
     if (!resource) { 
+      console.error("Resource not found", { resourceId: req.params.id });
       return res.status(404).json({ error: "Resource not found" }); 
     } 
 
     if (resource.status !== "requested") { 
+      console.error("Resource not in requested state", { resourceId: req.params.id, status: resource.status });
       return res.status(400).json({ error: "Resource is not in requested state" }); 
     } 
 
     // only the owner can approve 
     if (resource.owner.toString() !== req.user.id.toString()) { 
+      console.error("Unauthorized approval attempt", { resourceId: req.params.id, ownerId: resource.owner, userId: req.user.id });
       return res.status(403).json({ error: "Only the owner can approve this request" }); 
     } 
 
@@ -185,13 +194,15 @@ export const approveResource = async (req, res) => {
       .populate("owner", "name email") 
       .populate("borrower", "name email"); 
 
+    console.log("Resource approved successfully", { resourceId: resource._id });
+
     return res.status(200).json({ 
       success: true, 
       message: "Request approved", 
       data: updated 
     }); 
   } catch (err) { 
-    console.error("Approval error:", { 
+    console.error("Approval error", { 
       error: err.message, 
       stack: err.stack, 
       resourceId: req.params.id, 

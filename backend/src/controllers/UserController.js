@@ -96,14 +96,19 @@ export const updateProfile = async (req, res) => {
   try {
     const { name, flatNumber, location } = req.body;
 
+    console.log('Received update profile request:', req.body);
     const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
+    if (!user) {
+      console.error('User not found for ID:', req.user.id);
+      return res.status(404).json({ message: "User not found" });
+    }
+  
     if (name) user.name = name;
     if (flatNumber) user.flatNumber = flatNumber;
     if (location) user.location = location;
-
+  
     await user.save();
+    console.log('Updated user profile:', user);
     res.status(200).json({ message: "Profile updated", user });
   } catch (error) {
     console.error(error);

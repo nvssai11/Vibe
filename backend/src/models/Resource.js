@@ -2,7 +2,12 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
-const resourceSchema = new Schema({
+const resourceSchema = new mongoose.Schema({
+  category: {
+    type: String,
+    enum: ["tools", "appliances", "furniture", "books", "other"],
+    set: (value) => value.toLowerCase() // Normalize input to lowercase
+  },
   title: { type: String, required: true },
   description: String,
   category: { 
