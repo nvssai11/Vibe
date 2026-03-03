@@ -322,3 +322,31 @@ export const returnResource = async (req, res) => {
     });
   }
 };
+
+/**
+ * Fetch nearby resources
+ * GET /api/resources/nearby
+ * query: { lat, lng, radius }
+ */
+export const getNearbyResources = async (req, res) => {
+  try {
+    const { lat, lng, radius = 2000 } = req.query;
+
+    if (!lat || !lng) {
+      return res.status(400).json({ error: "Latitude and longitude are required." });
+    }
+
+    const resources = await Resource.find({
+      location: {
+        $near: {
+          $geometry: { type: "Point", coordinates: [parseFloat(lng), parseFloat(lat)] },
+          $maxDistance: parseInt(radius)
+        }
+      }
+    });
+
+    res.json({ success: true, data: resources });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};

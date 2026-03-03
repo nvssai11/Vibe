@@ -7,14 +7,17 @@ import Event from "../models/Event.js";
  */
 export const createEvent = async (req, res) => {
   try {
-    const { title, description, date, apartment } = req.body;
+    const { title, description, date, apartment, location } = req.body;
     if (!title || !date) return res.status(400).json({ error: "Title and date required" });
-
+    if (!location || !location.type || !location.coordinates) {
+      return res.status(400).json({ error: "Location with type and coordinates is required" });
+    }
     const event = await Event.create({
       title,
       description,
       date,
       apartment,
+      location,
       createdBy: req.userId
     });
     res.status(201).json(event);
@@ -52,5 +55,38 @@ export const rsvpEvent = async (req, res) => {
     res.json(event);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+/**
+ * Fetch nearby events
+ * GET /api/events/nearby
+ * query: { lat, lng, radius, startDate, endDate }
+ */
+export const getNearbyEvents = async (req, res) => {
+  try {
+    const { lat, lng, radius = 2000, startDate, endDate } = req.query;
+
+    if (!lat || !lng) {
+      return res.status(400).json({ error: "Latitude and longitude are required." });
+    }
+
+    const dateFilter = {};
+    if (startDate) dateFilter.$gte = new Date(startDate);
+    if (endDate) dateFilter.$lte = new Date(endDate);
+
+    const events = await Event.find({
+      location: {
+        $near: {
+          $geometry: { type: "Point", coordinates: [parseFloat(lng), parseFloat(lat)] },
+          $maxDistance: parseInt(radius)
+        }
+      },
+      ...(startDate || endDate ? { date: dateFilter } : {})
+    });
+
+    res.json({ success: true, data: events });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
   }
 };

@@ -94,7 +94,7 @@ export const getProfile = async (req, res) => {
 // Update user profile
 export const updateProfile = async (req, res) => {
   try {
-    const { name, flatNumber, location } = req.body;
+    const { name, flatNumber, location, visibilityRadius } = req.body;
 
     console.log('Received update profile request:', req.body);
     const user = await User.findById(req.user.id);
@@ -102,17 +102,56 @@ export const updateProfile = async (req, res) => {
       console.error('User not found for ID:', req.user.id);
       return res.status(404).json({ message: "User not found" });
     }
-  
+
     if (name) user.name = name;
     if (flatNumber) user.flatNumber = flatNumber;
     if (location) user.location = location;
-  
+    if (visibilityRadius) user.visibilityRadius = visibilityRadius;
+
     await user.save();
     console.log('Updated user profile:', user);
     res.status(200).json({ message: "Profile updated", user });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get nearby users
+export const getNearbyUsers = async (req, res) => {
+  try {
+    const { lng, lat, radius } = req.query;
+
+    if (!lng || !lat) return res.status(400).json({ error: "Longitude and latitude are required" });
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const effectiveRadius = radius ? parseInt(radius) : user.visibilityRadius || 1000; // Use visibilityRadius or default 1 km
+
+    const users = await User.find({
+      _id: { $ne: req.user.id }, // Exclude current user
+      location: {
+        $near: {
+          $geometry: { type: "Point", coordinates: [parseFloat(lng), parseFloat(lat)] },
+          $maxDistance: effectiveRadius
+        }
+      },
+      status: "approved" // only show approved users
+    })
+    .select("-password") // hide passwords
+    .populate({
+      path: 'apartment',
+      select: 'name'
+    });
+
+    console.log("[GET /users/nearby] Query:", req.query);
+    console.log("[GET /users/nearby] User ID:", req.user?.id);
+    res.status(200).json({ users });
+    console.log("[GET /users/nearby] Returned users:", users.map(u => ({ id: u._id, name: u.name, location: u.location })));
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -136,37 +175,5 @@ export const approveUser = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
-  }
-};
-
-/**
- * GET /api/users/nearby?lng=...&lat=...&radius=...
- * Returns users within a radius of the provided coordinates
- */
-export const getNearbyUsers = async (req, res) => {
-  try {
-    const { lng, lat, radius } = req.query;
-
-    if (!lng || !lat) return res.status(400).json({ error: "Longitude and latitude are required" });
-
-    const users = await User.find({
-      location: {
-        $near: {
-          $geometry: { type: "Point", coordinates: [parseFloat(lng), parseFloat(lat)] },
-          $maxDistance: radius ? parseInt(radius) : 1000 // default 1 km
-        }
-      },
-      status: "approved" // only show approved users
-    })
-    .select("-password") // hide passwords
-    .populate({
-      path: 'apartment',
-      select: 'name'
-    });
-
-    res.status(200).json({ users });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
   }
 };

@@ -83,7 +83,11 @@ export default function Resources() {
         title: newResource.title,
         description: newResource.description,
         category: newResource.category,
-        apartment: currentUser.apartment
+        apartment: currentUser.apartment,
+        location: {
+          type: "Point",
+          coordinates: [0, 0]
+        }
       });
       setNewResource({ title: '', description: '', category: '' });
       setShowCreateForm(false);
@@ -161,9 +165,26 @@ export default function Resources() {
                 placeholder="Resource title" 
                 value={newResource.title}
                 onChange={(e) => setNewResource({...newResource, title: e.target.value})}
+down
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
                 required 
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+              <select
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+                value={newResource.category}
+                onChange={(e) => setNewResource({...newResource, category: e.target.value})}
+                required
+              >
+                <option value="">Select category</option>
+                <option value="tools">Tools</option>
+                <option value="appliances">Appliances</option>
+                <option value="furniture">Furniture</option>
+                <option value="books">Books</option>
+                <option value="other">Other</option>
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
@@ -172,29 +193,9 @@ export default function Resources() {
                 value={newResource.description}
                 onChange={(e) => setNewResource({...newResource, description: e.target.value})}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition min-h-[100px]"
-                required 
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-              <select
-                name="category"
-                value={newResource.category}
-                onChange={(e) => setNewResource({ ...newResource, category: e.target.value })}
-              >
-                <option value="tools">Tools</option>
-                <option value="appliances">Appliances</option>
-                <option value="furniture">Furniture</option>
-                <option value="books">Books</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-            <button 
-              type="submit"
-              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transition-all"
-            >
-              Create Resource
-            </button>
+            <button type="submit" className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition">Add Resource</button>
           </form>
         </motion.div>
       )}

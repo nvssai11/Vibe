@@ -20,9 +20,7 @@ export default function Events() {
   const fetchEvents = async () => {
     try {
       console.log('Fetching events for apartment triggered events:', apartmentId);
-      
       setLoading(true);
-      
       const res = await getEvents(apartmentId);
       console.log('Events API response:', res);
       setEvents(res);
@@ -53,9 +51,9 @@ export default function Events() {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    console.log('Creating event with:', { title, description, date, apartment: apartmentId });
+    console.log('Creating event with:', { title, description, date, apartment: apartmentId, location: { type: "Point", coordinates: [0, 0] } });
     try {
-      const result = await createEvent({ title, description, date, apartment: apartmentId });
+      const result = await createEvent({ title, description, date, apartment: apartmentId, location: { type: "Point", coordinates: [0, 0] } });
       console.log('Event created successfully:', result);
       setTitle(""); setDescription(""); setDate("");
       fetchEvents();

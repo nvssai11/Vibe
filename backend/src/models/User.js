@@ -15,6 +15,7 @@ const userSchema = new Schema({
     type: { type: String, enum: ["Point"], default: "Point" },
     coordinates: { type: [Number], default: [0, 0] } // [lng, lat]
   },
+  visibilityRadius: { type: Number, default: 5000 }, // Default radius in meters
   createdAt: { type: Date, default: Date.now }
 });
 

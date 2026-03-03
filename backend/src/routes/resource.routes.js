@@ -6,7 +6,8 @@ import {
   requestResource,
   approveResource,
   declineResource,
-  returnResource
+  returnResource,
+  getNearbyResources
 } from "../controllers/resourceController.js";
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router.use(requireAuth);
 // Resource collection routes
 router.post("/", addResource);
 router.get("/", getResources);
+router.get("/nearby", getNearbyResources);
 
 // Resource instance routes
 router.patch("/:id/request", requestResource);

@@ -22,19 +22,27 @@ const resourceSchema = new mongoose.Schema({
     enum: ["available", "requested", "borrowed", "returned", "declined"], 
     default: "available" 
   },
- borrower: {
-  type: mongoose.Schema.Types.ObjectId,
-  ref: "User",
-  default: null
-
-},
+  borrower: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null
+  },
+  location: {
+    type: {
+      type: String,
+      enum: ["Point"],
+      required: true
+    },
+    coordinates: {
+      type: [Number],
+      required: true
+    }
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now  } 
-}
+});
 
-);
-
-
+resourceSchema.index({ location: "2dsphere" });
 resourceSchema.index({ apartment: 1, owner: 1 });
 
 export default mongoose.model("Resource", resourceSchema);
