@@ -1,0 +1,66 @@
+name: CI/CD
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency: cicd-${{ github.ref }}
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: cd frontend && npm ci
+      - name: Build frontend
+        run: cd frontend && npm run build
+
+  cd:
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - uses: azure/docker-login@v2
+        with:
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      - name: Build and push frontend image
+        run: |
+          docker build -f Dockerfile.frontend -t ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest .
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/workflow-frontend:latest
+      - name: Get AKS credentials
+        run: |
+          az aks get-credentials \
+            --resource-group ${{ secrets.AKS_RESOURCE_GROUP }} \
+            --name ${{ secrets.AKS_CLUSTER_NAME }} \
+            --overwrite-existing
+      - name: Apply namespace
+        run: kubectl apply -f k8s/namespace.yaml
+      - name: Create ACR pull secret
+        run: |
+          kubectl create secret docker-registry acr-pull-secret \
+            --docker-server=${{ secrets.ACR_LOGIN_SERVER }} \
+            --docker-username=${{ secrets.ACR_USERNAME }} \
+            --docker-password=${{ secrets.ACR_PASSWORD }} \
+            -n workflow-dashboard \
+            --dry-run=client -o yaml | kubectl apply -f -
+      - name: Apply frontend deployment
+        run: |
+          ACR="${{ secrets.ACR_LOGIN_SERVER }}"
+          sed "s|ACR_REGISTRY|$ACR|g" k8s/frontend-deployment.yaml | kubectl apply -f -
+      - name: Diagnose deployment
+        run: |
+          kubectl get pods -n workflow-dashboard -o wide
+          kubectl describe deployment workflow-frontend -n workflow-dashboard
+          kubectl get events -n workflow-dashboard --sort-by='.lastTimestamp' | tail -40
+      - name: Wait for rollout
+        run: kubectl rollout status deployment/workflow-frontend -n workflow-dashboard --timeout=600s
+      - name: Show services
+        run: kubectl get svc -n workflow-dashboard
+      - name: Print public IP
+        run: |
+          kubectl get svc -n workflow-dashboard -o jsonpath='{.items[?(@.spec.type=="LoadBalancer")].status.loadBalancer.ingress[0].ip}'
