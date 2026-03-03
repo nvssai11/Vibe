@@ -46,11 +46,11 @@ const Register = () => {
           setLongitude(position.coords.longitude);
         },
         (error) => {
-          setLocationError('Could not fetch location. Please enable location services.');
+          console.warn('Could not fetch location. Please enable location services.', error);
         }
       );
     } else {
-      setLocationError('Geolocation is not supported by your browser');
+      console.warn('Geolocation is not supported by your browser');
     }
   }, []);
 

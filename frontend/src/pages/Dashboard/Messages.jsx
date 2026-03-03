@@ -60,7 +60,6 @@ export default function Messages() {
       // Fetch notifications if needed
     }, 10000); // Poll every 10 seconds
 
-    setNotificationInterval(interval);
     return () => {
       console.log('Messages.jsx: Clearing notification polling');
       clearInterval(interval);

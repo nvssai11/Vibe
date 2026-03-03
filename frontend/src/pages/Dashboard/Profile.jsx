@@ -40,7 +40,7 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const updatedProfile = await updateProfile({ name, email, phone, flatNumber });
+      const updatedProfile = await updateProfile({ name, email, flatNumber });
       console.log('Updated profile:', updatedProfile);
       alert('Profile updated successfully!');
     } catch (error) {
