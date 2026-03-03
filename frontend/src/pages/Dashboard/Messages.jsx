@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import messageApi from '../../api/message.api';
 
 export default function Messages() {
@@ -8,10 +8,7 @@ export default function Messages() {
   const [activeConversation, setActiveConversation] = useState(null);
   const [messageInput, setMessageInput] = useState('');
   const [messages, setMessages] = useState([]);
-  const [notifications, setNotifications] = useState([]);
-  const [notificationInterval, setNotificationInterval] = useState(null);
   const { currentUser, isLoading } = useAuth();
-  console.log("Messages.jsx: useAuth()", { currentUser, isLoading });
   const location = useLocation();
   const messagesEndRef = useRef(null);
 

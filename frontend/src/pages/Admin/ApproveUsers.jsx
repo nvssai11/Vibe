@@ -24,7 +24,7 @@ function ApproveUsers() {
   useEffect(() => {
     console.log("useEffect triggered, currentUser:", currentUser);
     fetchUsers();
-  }, [currentUser?.apartment]);
+  }, [currentUser, fetchUsers]);
 
   const handleApprove = async (id) => {
     try {

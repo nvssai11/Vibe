@@ -25,7 +25,7 @@ import ApproveEvents from "./pages/Admin/ApproveEvents";
 
 // Components
 import ProtectedRoute from "./components/ProtectedRoute";
-import Navbar from "./components/Navbar";
+// Removed unused Navbar import
 
 function App() {
   return (

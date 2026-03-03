@@ -42,6 +42,36 @@ L.Icon.Default.mergeOptions({
 //   );
 // }
 
+// Fix default icon paths for Leaflet markers
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
+// Override default icon options
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
+
+// Helper component to fit map to all markers
+// Sidebar for user list
+// function UserSidebar({ users, onUserClick }) {
+//   return (
+//     <div className="sidebar">
+//       <h3>Nearby People</h3>
+//       <ul>
+//         {users.map((user, idx) => (
+//           <li key={user._id || idx} onClick={() => onUserClick(user)}>
+//             <img src={user.avatar || "https://ui-avatars.com/api/?name=" + user.name} alt={user.name} className="avatar" />
+//             <span>{user.name}</span>
+//           </li>
+//         ))}
+//       </ul>
+//     </div>
+//   );
+// }
+
 // FitBounds helper
 function FitBounds({ markers }) {
   const map = useMap();

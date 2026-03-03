@@ -36,7 +36,7 @@ export default function Events() {
     console.log('Apartment ID changed:', apartmentId);
     if (apartmentId) fetchEvents();
     else console.log('No apartment ID available');
-  }, [apartmentId]);
+  }, [apartmentId, fetchEvents]);
 
   if (!apartmentId) {
     return (

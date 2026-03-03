@@ -7,7 +7,7 @@ const Profile = () => {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  // Removed unused setPhone variable
   const [flatNumber, setFlatNumber] = useState('');
 
   useEffect(() => {

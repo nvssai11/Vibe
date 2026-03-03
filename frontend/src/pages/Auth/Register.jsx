@@ -18,7 +18,6 @@ const Register = () => {
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
 
-  const [locationError, setLocationError] = useState(null);
   const [loadingApartments, setLoadingApartments] = useState(false);
   const navigate = useNavigate();
 
