@@ -1,7 +1,8 @@
 name: CI/CD
+
 on:
   push:
-    branches: [master]
+    branches: [main]
   workflow_dispatch:
 concurrency: cicd-${{ github.ref }}
 
@@ -11,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install frontend dependencies
-        run: cd frontend && npm install
+        run: cd frontend && (npm ci || npm install)
       - name: Build frontend
         run: cd frontend && npm run build
 
@@ -37,7 +38,13 @@ jobs:
       - name: Apply namespace
         run: kubectl apply -f k8s/namespace.yaml
       - name: Create ACR pull secret
-        run: kubectl create secret docker-registry acr-pull-secret --docker-server=${{ secrets.ACR_LOGIN_SERVER }} --docker-username=${{ secrets.ACR_USERNAME }} --docker-password=${{ secrets.ACR_PASSWORD }} -n workflow-dashboard --dry-run=client -o yaml | kubectl apply -f -
+        run: |
+          kubectl create secret docker-registry acr-pull-secret \
+            --docker-server=${{ secrets.ACR_LOGIN_SERVER }} \
+            --docker-username=${{ secrets.ACR_USERNAME }} \
+            --docker-password=${{ secrets.ACR_PASSWORD }} \
+            -n workflow-dashboard \
+            --dry-run=client -o yaml | kubectl apply -f -
       - name: Apply frontend deployment
         run: |
           ACR="${{ secrets.ACR_LOGIN_SERVER }}"
@@ -52,4 +59,5 @@ jobs:
       - name: Show services
         run: kubectl get svc -n workflow-dashboard
       - name: Print public IP
-        run: kubectl get svc -n workflow-dashboard -o jsonpath='{.items[?(@.spec.type=="LoadBalancer")].status.loadBalancer.ingress[0].ip}'
+        run: |
+          kubectl get svc -n workflow-dashboard -o jsonpath='{.items[?(@.spec.type=="LoadBalancer")].status.loadBalancer.ingress[0].ip}'
