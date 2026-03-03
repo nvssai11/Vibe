@@ -1,5 +1,5 @@
 // frontend/src/pages/Dashboard/Events.jsx
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { getEvents, createEvent, rsvpEvent } from "../../api/event.api";
 import EventCard from "../../components/EventCard";
@@ -17,7 +17,7 @@ export default function Events() {
   console.log('Current user object:', currentUser);
   console.log('Extracted apartmentId:', apartmentId);
 
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       console.log('Fetching events for apartment triggered events:', apartmentId);
       setLoading(true);
@@ -30,7 +30,7 @@ export default function Events() {
       alert("Failed to fetch events");
       setLoading(false);
     }
-  };
+  }, [apartmentId]);
 
   useEffect(() => {
     console.log('Apartment ID changed:', apartmentId);

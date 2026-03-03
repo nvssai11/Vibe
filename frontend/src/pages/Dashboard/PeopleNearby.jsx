@@ -1,7 +1,7 @@
 // frontend/src/pages/Dashboard/PeopleNearby.jsx
 import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { getNearbyUsers } from "../../api/user.api";
 import UserCard from "../../components/UserCard";
 import { FiUsers, FiRefreshCw, FiMapPin,FiMap, FiList, FiMessageSquare } from "react-icons/fi";
@@ -55,7 +55,6 @@ function FitBounds({ markers }) {
 }
 
 export default function PeopleNearby() {
-  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

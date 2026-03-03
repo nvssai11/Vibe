@@ -9,13 +9,14 @@ export default function Messages() {
   const [messageInput, setMessageInput] = useState('');
   const [messages, setMessages] = useState([]);
   const { currentUser, isLoading } = useAuth();
+  const currentUserId = currentUser?.id || currentUser?._id;
   const location = useLocation();
   const messagesEndRef = useRef(null);
 
   // Function to send messages
   const handleSendMessage = async () => {
-    console.log("Messages.jsx: handleSendMessage called", { currentUser, isLoading, activeConversation, messageInput });
-    if (isLoading || !currentUser || !currentUser.id) {
+    console.log("Messages.jsx: handleSendMessage called", { currentUserId, isLoading, activeConversation, messageInput });
+    if (isLoading || !currentUserId) {
       alert('Your profile is still loading.');
       return;
     }
@@ -67,7 +68,7 @@ export default function Messages() {
   }, []);
 
   useEffect(() => {
-    console.log('Messages.jsx: useEffect [location.search, currentUser?._id, conversations]', { locationSearch: location.search, currentUserId: currentUser?.id, conversations });
+    console.log('Messages.jsx: useEffect [location.search, currentUserId, conversations]', { locationSearch: location.search, currentUserId, conversations });
     const searchParams = new URLSearchParams(location.search);
     const newChatcurrentUserId = searchParams.get('id');
     const newChatcurrentUserName = searchParams.get('name');
@@ -76,7 +77,7 @@ export default function Messages() {
       newChatcurrentUserId &&
       newChatcurrentUserName &&
       newChatcurrentUserName !== 'na' &&
-      currentUser?._id !== newChatcurrentUserId
+      currentUserId !== newChatcurrentUserId
     ) {
       // Only set activeConversation if it exists in conversations
       if (conversations.some(c => c.id === newChatcurrentUserId)) {
@@ -84,10 +85,10 @@ export default function Messages() {
         console.log('Messages.jsx: setActiveConversation', newChatcurrentUserId);
       }
     }
-  }, [location.search, currentUser?._id, conversations]);
+  }, [location.search, currentUserId, conversations]);
 
   useEffect(() => {
-    console.log('Messages.jsx: useEffect [location.search, currentUser?._id, conversations] for adding conversation', { locationSearch: location.search, currentUserId: currentUser?.id, conversations });
+    console.log('Messages.jsx: useEffect [location.search, currentUserId, conversations] for adding conversation', { locationSearch: location.search, currentUserId, conversations });
     const searchParams = new URLSearchParams(location.search);
     const newChatcurrentUserId = searchParams.get('id');
     const newChatcurrentUserName = searchParams.get('name');
@@ -96,7 +97,7 @@ export default function Messages() {
       newChatcurrentUserId &&
       newChatcurrentUserName &&
       newChatcurrentUserName !== 'na' &&
-      currentUser?._id !== newChatcurrentUserId
+      currentUserId !== newChatcurrentUserId
     ) {
       // Only add if not already present (by id)
       setConversations(prev => {
@@ -116,12 +117,12 @@ export default function Messages() {
       setActiveConversation(newChatcurrentUserId);
       console.log('Messages.jsx: setActiveConversation (new)', newChatcurrentUserId);
     }
-  }, [location.search, currentUser?._id, conversations]);
+  }, [location.search, currentUserId, conversations]);
 
   useEffect(() => {
-    console.log('Messages.jsx: useEffect [activeConversation, currentUser?._id]', { activeConversation, currentUserId: currentUser?.id });
+    console.log('Messages.jsx: useEffect [activeConversation, currentUserId]', { activeConversation, currentUserId });
     // Only proceed if currentUser and currentUser._id are defined
-    if (!currentUser || !currentUser.id) {
+    if (!currentUserId) {
       console.log('Messages.jsx: currentUser not loaded yet, skipping message/conversation fetch');
       return;
     }
@@ -142,7 +143,7 @@ export default function Messages() {
         return;
       }
       // Fetch all messages between current user and selected user
-      console.log('Messages.jsx: Fetching messages for', activeConversation, 'from user', currentUser._id);
+      console.log('Messages.jsx: Fetching messages for', activeConversation, 'from user', currentUserId);
       messageApi.getMessages(activeConversation)
         .then(response => {
           const msgs = Array.isArray(response.data) ? response.data : [];
@@ -150,7 +151,7 @@ export default function Messages() {
           const normalizedMsgs = msgs.map(msg => ({
             id: msg._id,
             text: msg.content || msg.text || '',
-            sender: (msg.sender?._id || msg.sender) === currentUser.id || (msg.sender?._id || msg.sender) === currentUser._id ? 'me' : 'them',
+            sender: (msg.sender?._id || msg.sender) === currentUserId ? 'me' : 'them',
             timestamp: msg.createdAt,
           }));
           setMessages(normalizedMsgs);
@@ -167,7 +168,7 @@ export default function Messages() {
     } else {
       setMessages([]);
     }
-  }, [activeConversation, currentUser?._id]);
+  }, [activeConversation, currentUserId]);
 
   useEffect(() => {
     // Scroll to bottom whenever messages change

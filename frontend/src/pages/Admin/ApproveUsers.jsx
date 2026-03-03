@@ -1,5 +1,5 @@
 // frontend/src/pages/Admin/ApproveUsers.jsx
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import { getPendingUsers, approveUser } from "../../api/admin.api";
@@ -7,19 +7,20 @@ import { getPendingUsers, approveUser } from "../../api/admin.api";
 function ApproveUsers() {
   const [users, setUsers] = useState([]);
   const { currentUser } = useAuth();
+  const apartmentId = currentUser?.apartment?._id || currentUser?.apartment;
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
-      if (!currentUser?.apartment) {
+      if (!apartmentId) {
         console.log("No apartment assigned to current user");
         return;
       }
-      const res = await getPendingUsers(currentUser.apartment._id || currentUser.apartment);
+      const res = await getPendingUsers(apartmentId);
       setUsers(res);
     } catch (error) {
       console.error("Error fetching pending users:", error);
     }
-  };
+  }, [apartmentId]);
 
   useEffect(() => {
     console.log("useEffect triggered, currentUser:", currentUser);
